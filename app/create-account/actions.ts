@@ -8,7 +8,7 @@ import {
 import db from "@/lib/db";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import getSession from "@/lib/session";
+import { saveSession } from "@/lib/utils";
 
 const checkUsername = (username: string) => !username.includes("potato");
 
@@ -109,11 +109,9 @@ export async function createAccount(prevState: any, formData: FormData) {
     });
 
     // 유저를 로그인 시키고
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    await saveSession(user.id);
 
-    // 홈으로 리다이렉트 시키디 "/home"
+    // 홈으로 리다이렉트 시키기 "/home"
     redirect("/profile");
   }
 }

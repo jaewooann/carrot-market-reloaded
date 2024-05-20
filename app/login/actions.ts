@@ -8,8 +8,8 @@ import {
 } from "../../lib/constants";
 import db from "@/lib/db";
 import bcrypt from "bcrypt";
-import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import { saveSession } from "@/lib/utils";
 
 const checkEmailExists = async (email: string) => {
   const user = await db.user.findUnique({
@@ -58,9 +58,7 @@ export async function login(prevState: any, formData: FormData) {
     });
     const ok = await bcrypt.compare(result.data.password, user!.password ?? "");
     if (ok) {
-      const session = await getSession();
-      session.id = user!.id;
-      await session.save();
+      await saveSession(user!.id);
       redirect("/profile");
     } else {
       return {
