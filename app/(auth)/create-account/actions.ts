@@ -8,7 +8,7 @@ import {
 import db from "@/lib/db";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import { saveSession } from "@/lib/utils";
+import { saveSession } from "@/lib/saveSession";
 
 const checkUsername = (username: string) => !username.includes("potato");
 

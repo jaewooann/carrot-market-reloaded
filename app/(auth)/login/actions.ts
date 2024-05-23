@@ -9,7 +9,7 @@ import {
 import db from "@/lib/db";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import { saveSession } from "@/lib/utils";
+import { saveSession } from "@/lib/saveSession";
 
 const checkEmailExists = async (email: string) => {
   const user = await db.user.findUnique({

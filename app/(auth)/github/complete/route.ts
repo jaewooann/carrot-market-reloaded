@@ -2,7 +2,7 @@ import db from "@/lib/db";
 import getAccessToken from "@/lib/github/getAccessToken";
 import { getUserEmail } from "@/lib/github/getUserEmail";
 import { getUserProfile } from "@/lib/github/getUserProfile";
-import { saveSession } from "@/lib/utils";
+import { saveSession } from "@/lib/saveSession";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
