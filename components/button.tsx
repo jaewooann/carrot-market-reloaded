@@ -5,12 +5,14 @@ import { useFormStatus } from "react-dom";
 
 interface ButtonProps {
   text: string;
+  type: "submit" | "button" | "reset";
 }
 
-const Button = ({ text }: ButtonProps) => {
+const Button = ({ text, type }: ButtonProps) => {
   const { pending } = useFormStatus();
   return (
     <button
+      type={type}
       disabled={pending}
       className="primary-btn h-10 disabled:bg-neutral-400 disabled:text-neutral-300 disabled:cursor-not-allowed"
     >
