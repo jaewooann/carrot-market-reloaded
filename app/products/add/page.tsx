@@ -7,11 +7,22 @@ import { FormEvent, useState } from "react";
 import { getUploadUrl, uploadProduct } from "./actions";
 import { MB, PLZ_ADD_PHOTO } from "@/lib/constants";
 import { useFormState } from "react-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ProductType, productSchema } from "./schema";
 
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
-  const [imageId, setImageId] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductType>({
+    resolver: zodResolver(productSchema),
+  });
 
   const isOverSizeImage = (file: File) => {
     if (file.size > 2 * MB) {
@@ -30,25 +41,20 @@ export default function AddProduct() {
     if (isOverSizeImage(file)) return;
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadURL } = result;
       setUploadUrl(uploadURL);
-      setImageId(id);
+      setValue(
+        "photo",
+        `https://imagedelivery.net/aSbksvJjax-AUC7qVnaC4A/${id}`
+      );
     }
   };
 
-  const onSubmitData = (event: FormEvent) => {
-    if (!preview) {
-      event.preventDefault();
-      alert(PLZ_ADD_PHOTO);
-      return;
-    }
-  };
-
-  const interceptAction = async (_: any, formData: FormData) => {
+  const onSubmit = handleSubmit(async (data: ProductType) => {
     // upload image to cloudflare
-    const file = formData.get("photo");
     if (!file) {
       return;
     }
@@ -63,21 +69,25 @@ export default function AddProduct() {
     }
 
     // replace `photo` in formData
-    const photoUrl = `https://imagedelivery.net/aSbksvJjax-AUC7qVnaC4A/${imageId}`;
-    formData.set("photo", photoUrl);
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("price", data.price + "");
+    formData.append("description", data.description);
+    formData.append("photo", data.photo);
 
     // call upload product.
-    return uploadProduct(_, formData);
+    return uploadProduct(formData);
+  });
+
+  const onValid = async () => {
+    await onSubmit();
   };
-  const [state, action] = useFormState(interceptAction, null);
+
+  console.log(register("title"));
 
   return (
     <div>
-      <form
-        action={action}
-        onSubmit={onSubmitData}
-        className="p-5 flex flex-col gap-5"
-      >
+      <form action={onValid} className="p-5 flex flex-col gap-5">
         <label
           htmlFor="photo"
           style={{ backgroundImage: `url(${preview})` }}
@@ -88,7 +98,7 @@ export default function AddProduct() {
               <PhotoIcon className="w-20" />
               <div className="text-neutral-400 text-sm">
                 {PLZ_ADD_PHOTO}
-                {state?.fieldErrors.photo}
+                {errors.photo?.message}
               </div>
             </>
           ) : null}
@@ -98,28 +108,29 @@ export default function AddProduct() {
           type="file"
           id="photo"
           name="photo"
+          accept="image/*"
           className="hidden"
         />
         <Input
-          name="title"
           type="text"
           placeholder="제목"
           required
-          errors={state?.fieldErrors.title}
+          {...register("title")}
+          errors={[errors.title?.message ?? ""]}
         />
         <Input
-          name="price"
           type="number"
           placeholder="가격"
           required
-          errors={state?.fieldErrors.price}
+          {...register("price")}
+          errors={[errors.price?.message ?? ""]}
         />
         <Input
-          name="description"
           type="text"
           placeholder="자세한 설명"
           required
-          errors={state?.fieldErrors.description}
+          {...register("description")}
+          errors={[errors.description?.message ?? ""]}
         />
         <Button type="submit" text="작성 완료" />
       </form>
