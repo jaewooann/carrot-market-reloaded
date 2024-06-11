@@ -25,7 +25,7 @@ const ProductDeleteButton = ({ productId }: ProductDeleteButtonProps) => {
       onClick={handleDelete}
       className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
     >
-      Delete Product
+      revalidate title cache
     </button>
   );
 };

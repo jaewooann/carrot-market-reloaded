@@ -44,7 +44,10 @@ const SMSLogin = () => {
             errors={state.error?.formErrors}
           />
         )}
-        <Button text={state.token ? "Verify Token" : "Send Verification SMS"} />
+        <Button
+          type="submit"
+          text={state.token ? "Verify Token" : "Send Verification SMS"}
+        />
       </form>
     </div>
   );

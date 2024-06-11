@@ -48,7 +48,7 @@ const CreateAccount = () => {
           required
           errors={state?.fieldErrors.confirm_password}
         />
-        <Button text="Create account" />
+        <Button type="submit" text="Create account" />
       </form>
       <SocialLogin />
     </div>
